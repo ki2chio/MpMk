@@ -3,8 +3,16 @@
 
 volatile short c_1000ms = 0;
 volatile bool flag_1000ms = false;
-volatile short c_5ms = 0;
-volatile bool flag_5ms = false;
+
+volatile short c_15000ms_time = 0;
+volatile bool flag_15000ms_time = false;
+
+volatile short c_20000ms_temp = 0;
+volatile bool flag_20000ms_temp = false;
+
+// volatile short c_5 = 0;
+// volatile bool flag_5 = false;
+
 const int buzzer = 3;
 
 int hours=0,minutes=0,seconds=0;
@@ -15,11 +23,23 @@ ISR(TIMER1_COMPA_vect){ // обработчик прерывания. Вызыв
   flag_1000ms = true;
   c_1000ms = 0;
  }
- c_5ms++;
- if(c_5ms == 5) { // Выполняем каждые 1c
-  flag_5ms = true;
-  c_5ms = 0;
- }}
+ c_15000ms_time++;
+ if(c_15000ms_time == 15000) { // Выполняем каждые 1c
+  flag_15000ms_time = true;
+  c_15000ms_time = 0;
+ }
+ c_20000ms_temp++;
+ if(c_20000ms_temp == 20000) { // Выполняем каждые 1c
+  flag_20000ms_temp = true;
+  c_20000ms_temp = 0;
+ }
+
+ // c_5ms++;
+ // if(c_5ms == 5) { // Выполняем каждые 1c
+ //  flag_5ms = true;
+ //  c_5ms = 0;
+ // }
+}
 void initTimer() { // инициализация Timer1
  cli(); // отключить глобальные прерывания
  TCNT1 = 0;
@@ -44,6 +64,8 @@ void setup() {
  digitalWrite(buzzer, HIGH);
  initTimer();
  inputTime();
+ Serial.begin(9600);
+ getTempHumDHT11();
 }
 
 
@@ -51,12 +73,16 @@ void loop() {
 	if(flag_1000ms) { // Выполняем каждую 1 с
 		flag_1000ms = false;
 		timeCounter();
-		dht_read();
+    while(!flag_1000ms)writeTimeToSignemt();
 	}
-		if(flag_5ms){
-		flag_5ms = false;
-		writeTimeToSignemt();
+	if(flag_15000ms_time){
+		flag_15000ms_time = false;
+		while(!flag_15000ms_time)writeHumToSigment();
 	}
+  	if(flag_20000ms_temp){
+    	flag_20000ms_temp = false;	
+    	while(!flag_20000ms_temp)writeTempToSignemt();
+    }
 }
 
 void writeTimeToSignemt(){
@@ -65,15 +91,17 @@ void writeTimeToSignemt(){
      printLed(3,numbers[seconds / 10]);
      printLed(4,numbers[seconds % 10]);}
 void writeHumToSigment(){
-	printLed(1,13);
-	printLed(2,12);
-	printLed(3,humidity/10);
-	printLed(4,humidity%10);}
+	printLed(1,numbers[humidity/10]);
+	printLed(2,numbers[humidity%10]);
+	printLed(3,0x9C);
+	printLed(4,0xC6);
+	}
 void writeTempToSignemt(){
-	printLed(1,11);
-	printLed(2,10);
-	printLed(3,temperature/10);   
-	printLed(4,temperature%10);}
+	printLed(1,numbers[temperature/10]);   
+	printLed(2,numbers[temperature%10]);
+	printLed(3,0x98);
+	printLed(4,0x93);
+	}
 
 void timeCounter(){
  seconds++;
