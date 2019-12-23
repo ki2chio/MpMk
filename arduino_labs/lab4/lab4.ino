@@ -5,6 +5,7 @@ volatile short c_1000ms = 0;
 volatile bool flag_1000ms = false;
 volatile short c_5ms = 0;
 volatile bool flag_5ms = false;
+const int buzzer = 3;
 
 int hours=0,minutes=0,seconds=0;
 
@@ -39,7 +40,8 @@ void setup() {
  pinMode(LCHCLK,OUTPUT);
  pinMode(STFCLK,OUTPUT);
  pinMode(SDI,OUTPUT);
-
+ pinMode(buzzer, OUTPUT);
+ digitalWrite(buzzer, HIGH);
  inputTime();
 }
 
@@ -60,20 +62,17 @@ void writeTimeToSignemt(){
      printLed(1,numbers[minutes / 10]);
      printLed(2,numbers[minutes % 10]);
      printLed(3,numbers[seconds / 10]);
-     printLed(4,numbers[seconds % 10]);
-}
+     printLed(4,numbers[seconds % 10]);}
 void writeHumToSigment(){
 	printLed(1,13);
 	printLed(2,12);
-	printLed(3,humidity%10);
-	printLed(4,humidity/10);
-}
+	printLed(3,humidity/10);
+	printLed(4,humidity%10);}
 void writeTempToSignemt(){
 	printLed(1,11);
 	printLed(2,10);
-	printLed(3,temperature%10);   
-	printLed(4,temperature/10);
-}
+	printLed(3,temperature/10);   
+	printLed(4,temperature%10);}
 
 void timeCounter(){
  seconds++;
@@ -83,34 +82,55 @@ void timeCounter(){
  }
  if(minutes==60){
      minutes=0;
- }
-}
-
+ }}
 
 void inputTime(){
 	while(true){
-	    if (!digitalRead(A1))
+	    if (!digitalRead(A1)){
 	    	minutes--;
-        delay(70);
-	    if (!digitalRead(A2))
+	    	digitalWrite(buzzer, LOW);
+	    	delay(150);
+	    	digitalWrite(buzzer, HIGH);
+	    }
+	    if (!digitalRead(A2)){
 	    	minutes++;
-	    delay(70);
+	    	digitalWrite(buzzer, LOW);
+	    	delay(150);
+	    	digitalWrite(buzzer, HIGH);
+	    }
 	    if (minutes == 60)minutes=0;
 	    if (minutes == -1)minutes=59;
-	    if (!digitalRead(A3))break;
+	    if (!digitalRead(A3)){
+			digitalWrite(buzzer, LOW);
+			delay(200);
+			digitalWrite(buzzer, HIGH);
+	    	break;
+	    }
 	    writeTimeToSignemt();
 	}
 	delay(250);
 	while(true){
-	    if (!digitalRead(A1))
-	    	seconds--;
+	    if (!digitalRead(A1)){
+	    	seconds--;    	
+	    	digitalWrite(buzzer, LOW);
+	    	delay(150);
+	    	digitalWrite(buzzer, HIGH);
+	    }
 	    delay(70);	    
-	    if (!digitalRead(A2))
+	    if (!digitalRead(A2)){
 	    	seconds++;
+	    	digitalWrite(buzzer, LOW);
+	    	delay(150);
+	    	digitalWrite(buzzer, HIGH);
+	    }
 	    delay(70);	    
 	    if (seconds == 60)seconds=0;
 	    if (seconds == -1)seconds=59;
-	    if (!digitalRead(A3))break;
+	    if (!digitalRead(A3)){
+			digitalWrite(buzzer, LOW);
+			delay(200);
+			digitalWrite(buzzer, HIGH);
+	    	break;
+	    }
 	    writeTimeToSignemt();   
-	}
-}
+	}}
