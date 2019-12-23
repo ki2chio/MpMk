@@ -42,6 +42,7 @@ void setup() {
  pinMode(SDI,OUTPUT);
  pinMode(buzzer, OUTPUT);
  digitalWrite(buzzer, HIGH);
+ initTimer();
  inputTime();
 }
 
